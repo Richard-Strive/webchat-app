@@ -1,10 +1,15 @@
 import "./App.css";
-import GeneralChat from "./components/GeneralChat";
+import GeneralChatPage from "./components/GeneralChatPage";
+import React, { useEffect } from "react";
+import io from "socket.io-client";
 
 function App() {
+  useEffect(() => {
+    io("http://localhost:8800/");
+  }, []);
   return (
     <div className="App">
-      <GeneralChat />
+      <GeneralChatPage />
     </div>
   );
 }

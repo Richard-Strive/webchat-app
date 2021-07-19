@@ -1,15 +1,27 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import io from "socket.io-client";
 
-function GeneralChat() {
+const socket = io();
+
+function GeneralChatPage() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setMessages((messages) => messages.concat(message));
+    // setMessages((messages) => messages.concat(message));
+
+    socket.emit("msg", message);
+
+    socket.on("msg", (data) => {
+      setMessages((messages) => messages.concat(data));
+    });
+
     setMessage("");
   };
+
+  useEffect(() => {}, []);
   return (
     <GeneralChatContainer>
       <h1>Public chat</h1>
@@ -19,20 +31,20 @@ function GeneralChat() {
             <p>{message}</p>
           ))}
         </Messages>
-        <form id="form" action="">
+        <form id="form" action="" onSubmit={(e) => handleSubmit(e)}>
           <MessageInput
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Type your first message here..."
           />
-          <FormButton onClick={(e) => handleSubmit(e)}>Send</FormButton>
+          <FormButton type="submit">Send</FormButton>
         </form>
       </MessagesContainer>
     </GeneralChatContainer>
   );
 }
 
-export default GeneralChat;
+export default GeneralChatPage;
 
 const GeneralChatContainer = styled.div`
   height: 100vh;

@@ -2,39 +2,81 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import io from "socket.io-client";
 
-const socket = io();
+const socket = io("http://localhost:8800/");
 
 function GeneralChatPage() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [connectedUsers, setConnectedUsers] = useState([]);
+  const [itsTyping, setItsTyping] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // setMessages((messages) => messages.concat(message));
-
-    socket.emit("msg", message);
-
-    socket.on("msg", (data) => {
-      setMessages((messages) => messages.concat(data));
-    });
-
+    socket.emit("chat message", message);
     setMessage("");
   };
 
-  useEffect(() => {}, []);
+  /* 
+User is typing function OK
+
+- Create two methods on the server:
+1) Call one when the user is pressing the kays
+
+2) Call the other one when the user is not typing 
+
+*/
+
+  /*
+ 
+
+
+ */
+
+  const isTyping = () => {
+    setItsTyping(true);
+    socket.emit("someevent", true);
+
+    setTimeout(() => {
+      setItsTyping(false);
+      socket.emit("someevent", false);
+    }, 4000);
+  };
+
+  useEffect(() => {
+    socket.on("chat message", (data) => {
+      setMessages((messages) => messages.concat(data));
+    });
+
+    socket.on("welcome", (data) => {
+      setConnectedUsers((connectedUsers) => connectedUsers.concat(data));
+    });
+
+    socket.on("someevent", (data) => setItsTyping(data));
+
+    socket.on("disconnect", (data) => {
+      setMessages((messages) => messages.concat(data));
+    });
+  }, []);
   return (
     <GeneralChatContainer>
       <h1>Public chat</h1>
       <MessagesContainer>
+        <ul>
+          {connectedUsers.map((user) => (
+            <li>{user.msg}</li>
+          ))}
+        </ul>
         <Messages>
           {messages.map((message) => (
             <p>{message}</p>
           ))}
         </Messages>
         <form id="form" action="" onSubmit={(e) => handleSubmit(e)}>
+          {itsTyping ? "user is typing..." : ""}
           <MessageInput
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={() => isTyping()}
             placeholder="Type your first message here..."
           />
           <FormButton type="submit">Send</FormButton>
@@ -61,6 +103,7 @@ const MessagesContainer = styled.div`
   width: 75%;
   background-color: #5cb37d;
   position: relative;
+  overflow: auto;
 `;
 
 const MessageInput = styled.input`

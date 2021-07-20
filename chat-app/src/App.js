@@ -1,12 +1,18 @@
 import "./App.css";
 import GeneralChatPage from "./components/GeneralChatPage";
 import React, { useEffect } from "react";
-import io from "socket.io-client";
+
+/* 
+What to implement:
+
+-Nickname support 
+-User it's typing feature OK
+-show who's online
+
+*/
 
 function App() {
-  useEffect(() => {
-    io("http://localhost:8800/");
-  }, []);
+  useEffect(() => {}, []);
   return (
     <div className="App">
       <GeneralChatPage />

@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 function PrivateChat() {
-  return <PrivateChatContainer></PrivateChatContainer>;
+  return (
+    <PrivateChatContainer>
+      <ConnectedUsersList></ConnectedUsersList>
+    </PrivateChatContainer>
+  );
 }
 
 export default PrivateChat;

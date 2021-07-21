@@ -33,11 +33,9 @@ User is typing function OK
  */
 
   const isTyping = () => {
-    setItsTyping(true);
     socket.emit("someevent", true);
 
     setTimeout(() => {
-      setItsTyping(false);
       socket.emit("someevent", false);
     }, 4000);
   };

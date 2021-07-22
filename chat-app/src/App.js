@@ -1,5 +1,11 @@
 import "./App.css";
 import React, { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  useHistory,
+} from "react-router-dom";
 
 import GeneralChatPage from "./components/GeneralChatPage";
 import PrivateChat from "./components/PrivateChat";
@@ -24,9 +30,19 @@ function App() {
   useEffect(() => {}, []);
   return (
     <div className="App">
-      {/* <GeneralChatPage /> */}
-      <JoinPage socket={socket} />
-      {/* <PrivateChat socket={socket} /> */}
+      <Router>
+        <Switch>
+          <Route path="/private">
+            <PrivateChat socket={socket} />
+          </Route>
+          <Route path="/general">
+            <GeneralChatPage socket={socket} />
+          </Route>
+          <Route path="/">
+            <JoinPage socket={socket} useHistory={useHistory} />
+          </Route>
+        </Switch>
+      </Router>
     </div>
   );
 }

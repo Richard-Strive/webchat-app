@@ -26,7 +26,7 @@ function App() {
     <div className="App">
       {/* <GeneralChatPage /> */}
       <JoinPage socket={socket} />
-      {/* <PrivateChat /> */}
+      {/* <PrivateChat socket={socket} /> */}
     </div>
   );
 }

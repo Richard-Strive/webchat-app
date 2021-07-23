@@ -1,15 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Loader from "react-loader-spinner";
 import peoples from "../assets/peoples.jpg";
-import neon from "../assets/neon.jpg";
 
 import styled from "styled-components";
 
 function JoinPage({ socket, useHistory }) {
   const [name, setName] = useState("");
   const [loader, setLoader] = useState(false);
-  const [names, setNames] = useState([]);
-  const [joinedLater, setJoinedLater] = useState([]);
 
   const history = useHistory();
 
@@ -17,24 +14,15 @@ function JoinPage({ socket, useHistory }) {
     setLoader(true);
     e.preventDefault();
     socket.auth = { name };
-    socket.connect();
 
     setTimeout(() => {
       setLoader(false);
-
+      socket.connect();
       history.push("/private");
     }, 3000);
-
-    console.log(socket);
   };
 
-  useEffect(() => {
-    socket.on("users", (data) => setNames(data));
-    socket.on("user connected", (data) =>
-      setJoinedLater((joinedLater) => joinedLater.concat(data))
-    );
-  }, []);
-
+  useEffect(() => {}, []);
   return (
     <JoinPageContainer peoples={peoples}>
       {loader ? (
@@ -64,7 +52,6 @@ export default JoinPage;
 const JoinPageContainer = styled.div`
   height: 100vh;
   width: 100vw;
-  /* background-image: url("https://source.unsplash.com/1600x1600/?talk"); */
   background-image: url(${(props) => props.peoples});
   background-size: 1600px 1000px;
 
@@ -81,7 +68,7 @@ const JoinPageContainer = styled.div`
     background: rgba(226, 233, 226, 0.753);
     width: 30vw;
     border-radius: 60px;
-
+    padding-left: 15px;
     font-size: 14px;
     font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
     font-style: oblique;

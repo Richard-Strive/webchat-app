@@ -6,6 +6,7 @@ import { RiSendPlaneLine } from "react-icons/ri";
 
 const SendIcon = styled(RiSendPlaneLine)`
   font-size: 30px;
+  color: #494747;
 `;
 
 function PrivateChat({ socket }) {
@@ -21,17 +22,17 @@ function PrivateChat({ socket }) {
   };
 
   useEffect(() => {
-    socket.on("user connected", (data) =>
-      setUsers((users) => users.concat(data))
-    );
+    socket.on("users", (data) => setUsers(data));
   }, []);
   return (
     <PrivateChatContainer neon={neon}>
       <UsersList>
-        <SingleUser>
-          <p>Name</p>
-          <small>Online</small>
-        </SingleUser>
+        {users.map((user, index) => (
+          <SingleUser key={index}>
+            <p>{user.username}</p>
+            <small>Online</small>
+          </SingleUser>
+        ))}
       </UsersList>
       <ChatBox>
         <SelectedUser>

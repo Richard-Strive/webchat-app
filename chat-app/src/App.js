@@ -14,7 +14,12 @@ import JoinPage from "./components/JoinPage";
 import io from "socket.io-client";
 
 const URL = "http://localhost:8800";
-const socket = io(URL, { autoConnect: false });
+
+const connOpt = {
+  transports: ["websocket", "polling"],
+};
+
+const socket = io(URL, { autoConnect: false }, connOpt);
 
 /*
 

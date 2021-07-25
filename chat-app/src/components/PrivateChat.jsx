@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 
 import neon from "../assets/neon.jpg";
@@ -10,25 +11,52 @@ const SendIcon = styled(RiSendPlaneLine)`
 `;
 
 function PrivateChat({ socket }) {
-  const [selectedUser, setSelectedUser] = useState();
+  const [selectedUser, setSelectedUser] = useState("");
   const [users, setUsers] = useState([]);
+  const [owner, setOwner] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [message, setMessage] = useState();
+  const [message, setMessage] = useState("");
+
+  const dispatch = useDispatch();
+  const me = useSelector((state) => state.me);
+
+  // SORT USERS AND OWN NAME FIRST
+  const newUserList = users.sort((a, b) => {
+    if (a.username === me) return -1;
+    if (b.username === me) return 1;
+    if (a.username < b.username) return -1;
+    return a.username > b.username ? 1 : 0;
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setMessages((messages) => messages.concat(message));
+    socket.emit("pvt", {
+      message,
+      to: selectedUser.userID,
+    });
+    setMessages((messages) => messages.concat({ message, from: socket.id }));
     setMessage("");
   };
 
   useEffect(() => {
     socket.on("users", (data) => setUsers(data));
+    socket.on("pvt", (data) => console.log(data));
+    socket.on("pvt", (data) => {
+      setMessages((messages) => messages.concat(data));
+    });
+    socket.on("connect", () => {
+      const meObj = {
+        name: socket.auth.name,
+        id: socket.id,
+      };
+      setOwner(meObj);
+    });
   }, []);
   return (
     <PrivateChatContainer neon={neon}>
       <UsersList>
-        {users.map((user, index) => (
-          <SingleUser key={index}>
+        {newUserList.map((user, index) => (
+          <SingleUser key={index} onClick={() => setSelectedUser(user)}>
             <p>{user.username}</p>
             <small>Online</small>
           </SingleUser>
@@ -36,15 +64,28 @@ function PrivateChat({ socket }) {
       </UsersList>
       <ChatBox>
         <SelectedUser>
-          <h3>The User Name</h3>
+          <h3>{selectedUser.username}</h3>
         </SelectedUser>
         <ChatMessages>
-          <SingleMsg>
-            <p>This is a simple message</p>
-          </SingleMsg>
-          <SingleMsgMe>
-            <p>This is a simple message</p>
-          </SingleMsgMe>
+          {selectedUser &&
+            messages.map((msg) => {
+              return (
+                msg.from === selectedUser.userID && (
+                  <SingleMsg>
+                    <p>{msg.message}</p>
+                  </SingleMsg>
+                )
+              );
+            })}
+          {messages.map((msg) => {
+            return (
+              msg.from === owner.id && (
+                <SingleMsgMe>
+                  <p>{msg.message}</p>
+                </SingleMsgMe>
+              )
+            );
+          })}
         </ChatMessages>
         <ChatForm onSubmit={(e) => handleSubmit(e)}>
           <input

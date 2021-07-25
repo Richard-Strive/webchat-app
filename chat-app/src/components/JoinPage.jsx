@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import Loader from "react-loader-spinner";
 import peoples from "../assets/peoples.jpg";
 
 import styled from "styled-components";
+
+// dispatch({ type: "COMING_SOON", payload: false })
 
 function JoinPage({ socket, useHistory }) {
   const [name, setName] = useState("");
   const [loader, setLoader] = useState(false);
 
   const history = useHistory();
+  const dispatch = useDispatch();
 
   const handleSumbit = (e) => {
     setLoader(true);
@@ -17,6 +21,7 @@ function JoinPage({ socket, useHistory }) {
 
     setTimeout(() => {
       setLoader(false);
+      dispatch({ type: "ME", payload: `${name}` });
       socket.connect();
       history.push("/private");
     }, 3000);
@@ -38,7 +43,7 @@ function JoinPage({ socket, useHistory }) {
           <input
             type="text"
             onChange={(e) => setName(e.target.value)}
-            placeholder="Write your nickaname"
+            placeholder="Write your nickname"
             value={name}
           />
         </form>
